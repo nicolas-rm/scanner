@@ -3,19 +3,18 @@
 
   <div fxLayout="row" fxLayoutAlign="center center" class="margin-y">
     <div fxLayout="row" fxLayoutAlign="center center" class="margin-y">
-      <mat-form-field class="example-form-field">
+      <mat-form-field class="example-form-field w-100" style="width: 100%;">
         <mat-label>Codigo</mat-label>
-        <input matInput type="text" [(ngModel)]="this.manualInput" />
-        @if (this.manualInput) {
+        <input matInput type="text" [(ngModel)]="manualInput" />
         <button
           matSuffix
           mat-icon-button
           aria-label="Clear"
-          (click)="this.manualInput = ''"
+          *ngIf="manualInput"
+          (click)="manualInput = ''"
         >
           <mat-icon>close</mat-icon>
         </button>
-        }
       </mat-form-field>
 
       <button
@@ -59,6 +58,7 @@
       </button>
     </div>
   </div>
+
   <mat-menu #menu="matMenu">
     <mat-checkbox
       *ngFor="let format of availableFormats"
@@ -69,17 +69,34 @@
     </mat-checkbox>
   </mat-menu>
 
+  <mat-form-field appearance="fill" style="width: 100%;">
+    <mat-label>Seleccionar cámara</mat-label>
+    <mat-select [(ngModel)]="selectedCamera" (selectionChange)="selectCamera($event.value)">
+      <mat-option *ngFor="let camera of cameras" [value]="camera">{{ camera.label }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
   <zxing-scanner
     *ngIf="scanning"
     [formats]="allowedFormats"
+    [(device)]="selectedCamera"
     (scanSuccess)="handleQrCodeResult($event)"
     [autostart]="scanning"
+    [tryHarder]="true"
   ></zxing-scanner>
 
-  <mat-card *ngFor="let item of scannedItems" style="margin-top: 20px">
-    <mat-card-content>
-      <p><strong>Code:</strong> {{ item.data }}</p>
-      <p><strong>Timestamp:</strong> {{ item.timestamp }}</p>
-    </mat-card-content>
-  </mat-card>
+  <div *ngFor="let item of scannedItems">
+    <mat-card style="margin-top: 1rem">
+      <mat-card-content>
+        <p><strong>Code:</strong> {{ item.data }}</p>
+        <p><strong>Timestamp:</strong> {{ item.timestamp }}</p>
+      </mat-card-content>
+      <mat-card-actions>
+        <button mat-button color="accent" (click)="viewItem(item)">View</button>
+        <button mat-button color="warn" (click)="deleteItem(item)">
+          Delete
+        </button>
+      </mat-card-actions>
+    </mat-card>
+  </div>
 </div>
