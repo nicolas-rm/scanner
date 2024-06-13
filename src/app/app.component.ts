@@ -129,7 +129,7 @@ export class AppComponent implements OnInit {
         const timestamp = moment().format('YYYY-MM-DD HH:mm A');
         // Verificar que no exista
         if (this.scannedItems.find((item) => item.data === resultString.toLocaleUpperCase())) {
-            this.showSnackBar('Codigo Existente.');
+            this.showSnackBar('Codigo Existente.' + '\n' + resultString.toLocaleUpperCase());
             return;
         }
 
@@ -170,7 +170,7 @@ export class AppComponent implements OnInit {
 
             // Verificar si no existe
             if (this.scannedItems.find((item) => item.data === this.manualInput.toLocaleUpperCase())) {
-                this.showSnackBar('Codigo Existente.');
+                this.showSnackBar('Codigo Existente.' + '\n' + this.manualInput.toLocaleUpperCase());
                 return;
             }
 
@@ -245,7 +245,7 @@ export class AppComponent implements OnInit {
 
     private showSnackBar(message: string) {
         this.snackBar.open(message, 'Cerrar', {
-            horizontalPosition: 'start', // Posición horizontal 'start' | 'center' | 'end' | 'left' | 'right'
+            horizontalPosition: 'center', // Posición horizontal 'start' | 'center' | 'end' | 'left' | 'right'
             verticalPosition: 'top',
             duration: 5000, // Duración en milisegundos
         });

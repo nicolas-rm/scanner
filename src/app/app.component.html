@@ -92,8 +92,8 @@
     </div>
 
 
-    <div *ngIf="!loading && scannedItems.length > 0" fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="start stretch" fxFlexFill>
-        <div *ngIf="!loading" fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="start stretch" fxFlexFill>
+    <div *ngIf="!loading && scannedItems.length > 0" fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="center stretch" fxFlexFill>
+        <div *ngIf="!loading" fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="center stretch" fxFlexFill>
             <div *ngFor="let item of scannedItems" fxFlex="25%" fxFlex.md="25%" fxFlex.sm="50%" fxFlex.xs="100%">
                 <mat-card class="mat-elevation-z8">
                     <mat-card-content class="text-wrap">

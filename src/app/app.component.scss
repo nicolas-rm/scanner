@@ -308,3 +308,12 @@ zxing-scanner {
   align-items: center;
   height: 100%;
 }
+
+/* styles.css (o tu archivo de estilos correspondiente) */
+
+mat-snack-bar-container {
+  text-align: center; /* Centrar el texto dentro del snackBar */
+  justify-content: center; /* Centrar el snackBar en la pantalla */
+  align-items: center;
+  overflow-wrap: break-word; /* Permitir el ajuste de línea para palabras largas */
+}
