@@ -2,7 +2,7 @@
 <div mat-dialog-content class="w-100" fxLayout="column" fxLayoutAlign="start stretch" style="width: 100%">
   <mat-form-field appearance="fill" style="width: 100%">
     <mat-label>Code</mat-label>
-    <input matInput [(ngModel)]="editableData.data" style="width: 100%" />
+    <input matInput [(ngModel)]="editableData.data" style="width: 100%" [autofocus]="false" />
   </mat-form-field>
   <mat-form-field appearance="fill" style="width: 100%">
     <mat-label>Creado</mat-label>

@@ -3,7 +3,7 @@
     <div fxLayout="row" fxLayoutAlign="center center" class="margin-y" style="width: 100%">
         <mat-form-field class="example-form-field w-100">
             <mat-label>Codigo</mat-label>
-            <input matInput type="text" [(ngModel)]="manualInput" #inputElement />
+            <input matInput type="text" [(ngModel)]="manualInput" [autofocus]="true" />
             <button matSuffix mat-icon-button aria-label="Clear" *ngIf="manualInput" (click)="manualInput = ''">
                 <mat-icon>close</mat-icon>
             </button>
