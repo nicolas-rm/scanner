@@ -110,7 +110,7 @@ export class AppComponent implements OnInit {
 
     async handleQrCodeResult(resultString: string) {
         const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
-        this.scannedItems.push({ data: resultString, timestamp });
+        // this.scannedItems.push({ data: resultString, timestamp });
         this.fireStore.create({ data: resultString, timestamp })
         this.scanning = false; // Stop scanning after receiving a result
     }
@@ -136,7 +136,7 @@ export class AppComponent implements OnInit {
     addManualInput() {
         if (this.manualInput.trim()) {
             const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
-            this.scannedItems.push({ data: this.manualInput, timestamp });
+            // this.scannedItems.push({ data: this.manualInput, timestamp });
             this.manualInput = '';
         }
     }
