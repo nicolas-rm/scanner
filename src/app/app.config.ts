@@ -34,7 +34,10 @@ export const appConfig: ApplicationConfig = {
         provideFirebaseApp(() => initializeApp(firebaseConfig)),
         provideFirestore(() => getFirestore()),
         importProvidersFrom(AngularFirestoreModule),
-        importProvidersFrom(AngularFirestoreModule.enablePersistence()),
+        importProvidersFrom(AngularFirestoreModule.enablePersistence({
+            experimentalForceOwningTab: true,
+            synchronizeTabs: true
+        })),
         importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
         importProvidersFrom(AngularFirestore), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
