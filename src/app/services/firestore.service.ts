@@ -41,7 +41,7 @@ export class FirestoreService {
     // Obtener todos los documentos de scanners
     // Obtener todos los documentos de scanners ordenados por timestamp
     getAlls(): Observable<ScannerData[]> {
-        return this.fireStore.collection(this.collection, ref => ref.orderBy('timestamp', 'asc')).snapshotChanges().pipe(
+        return this.fireStore.collection(this.collection, ref => ref.orderBy('timestamp', 'desc')).snapshotChanges().pipe(
             map(actions =>
                 actions.map(action => {
                     const data = action.payload.doc.data() as ScannerData;
