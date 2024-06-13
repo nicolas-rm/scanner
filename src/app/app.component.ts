@@ -65,17 +65,17 @@ export class AppComponent implements OnInit {
     loading: boolean = false; // Variable de estado para el spinner
 
     availableFormats = [
-        { format: BarcodeFormat.QR_CODE, name: 'QR Code' },
-        { format: BarcodeFormat.DATA_MATRIX, name: 'Data Matrix' },
-        { format: BarcodeFormat.AZTEC, name: 'Aztec' },
+        // { format: BarcodeFormat.QR_CODE, name: 'QR Code' },
+        // { format: BarcodeFormat.DATA_MATRIX, name: 'Data Matrix' },
+        // { format: BarcodeFormat.AZTEC, name: 'Aztec' },
         { format: BarcodeFormat.CODE_128, name: 'Code 128' },
-        { format: BarcodeFormat.CODE_39, name: 'Code 39' },
-        { format: BarcodeFormat.EAN_13, name: 'EAN-13' },
-        { format: BarcodeFormat.EAN_8, name: 'EAN-8' },
-        { format: BarcodeFormat.ITF, name: 'ITF' },
-        { format: BarcodeFormat.UPC_A, name: 'UPC-A' },
-        { format: BarcodeFormat.UPC_E, name: 'UPC-E' },
-        { format: BarcodeFormat.PDF_417, name: 'PDF 417' },
+        // { format: BarcodeFormat.CODE_39, name: 'Code 39' },
+        // { format: BarcodeFormat.EAN_13, name: 'EAN-13' },
+        // { format: BarcodeFormat.EAN_8, name: 'EAN-8' },
+        // { format: BarcodeFormat.ITF, name: 'ITF' },
+        // { format: BarcodeFormat.UPC_A, name: 'UPC-A' },
+        // { format: BarcodeFormat.UPC_E, name: 'UPC-E' },
+        // { format: BarcodeFormat.PDF_417, name: 'PDF 417' },
     ];
 
     allowedFormats: BarcodeFormat[] = this.availableFormats.map((f) => f.format);
