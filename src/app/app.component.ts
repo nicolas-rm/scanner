@@ -33,6 +33,9 @@ import { BehaviorSubject } from 'rxjs';
 import { FirestoreService } from './services/firestore.service';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importar MatSnackBarModule
+
+
 interface ScannerData {
     data: string;
     timestamp: string;
@@ -42,7 +45,7 @@ interface ScannerData {
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [RouterOutlet, CommonModule, MatButtonModule, MatListModule, MatCardModule, FlexLayoutModule, ZXingScannerModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatFormFieldModule, FormsModule, MatInputModule, ItemDetailsModalComponent, MatSelectModule, MatOptionModule, MatGridListModule, MatToolbarModule, MatSidenavModule],
+    imports: [RouterOutlet, CommonModule, MatButtonModule, MatListModule, MatCardModule, FlexLayoutModule, ZXingScannerModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatFormFieldModule, FormsModule, MatInputModule, ItemDetailsModalComponent, MatSelectModule, MatOptionModule, MatGridListModule, MatToolbarModule, MatSidenavModule, MatSnackBarModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     providers: [FirestoreService],
@@ -81,7 +84,7 @@ export class AppComponent implements OnInit {
         // this.inputElement.nativeElement.focus();
     }
 
-    constructor(public dialog: MatDialog, private fireStore: FirestoreService) {
+    constructor(public dialog: MatDialog, private snackBar: MatSnackBar, private fireStore: FirestoreService) {
         if (this.inputElement) {
             this.inputElement.nativeElement.focus();
             // Uppercase
@@ -110,6 +113,12 @@ export class AppComponent implements OnInit {
 
     async handleQrCodeResult(resultString: string) {
         const timestamp = moment().format('YYYY-MM-DD HH:mm A');
+        // Verificar que no exista
+        if (this.scannedItems.find((item) => item.data === resultString.toLocaleUpperCase())) {
+            this.showSnackBar('Codigo Existente.');
+            return;
+        }
+
         this.fireStore.create({ data: resultString.toLocaleUpperCase(), timestamp })
         this.scanning = false; // Stop scanning after receiving a result
     }
@@ -135,6 +144,13 @@ export class AppComponent implements OnInit {
     addManualInput() {
         if (this.manualInput.trim()) {
             const timestamp = moment().format('YYYY-MM-DD HH:mm A');
+
+            // Verificar si no existe
+            if (this.scannedItems.find((item) => item.data === this.manualInput.toLocaleUpperCase())) {
+                this.showSnackBar('Codigo Existente.');
+                return;
+            }
+
             this.fireStore.create({ data: this.manualInput.toLocaleUpperCase(), timestamp })
             this.manualInput = '';
         }
@@ -173,5 +189,13 @@ export class AppComponent implements OnInit {
 
     toggleTorch(): void {
         this.flashEnabled = !this.flashEnabled;
+    }
+
+    private showSnackBar(message: string) {
+        this.snackBar.open(message, 'Cerrar', {
+            horizontalPosition: 'center', // Posición horizontal 'start' | 'center' | 'end' | 'left' | 'right'
+            verticalPosition: 'top',
+            duration: 5000, // Duración en milisegundos
+        });
     }
 }
