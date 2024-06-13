@@ -9,21 +9,25 @@
             </button>
         </mat-form-field>
 
-        <button *ngIf="manualInput.trim()" mat-icon-button class="btn-success" color="primary" (click)="addManualInput()" style="margin-bottom: 1.25rem; margin-right: 10px">
+        <button *ngIf="manualInput.trim()" mat-icon-button class="btn-success" color="primary"
+            (click)="addManualInput()" style="margin-bottom: 1.25rem; margin-right: 10px">
             <mat-icon>add</mat-icon>
         </button>
         <!-- Botones de escaneo -->
-        <button *ngIf="!scanning && !manualInput.trim()" mat-icon-button class="btn-success" color="primary" (click)="startScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
+        <button *ngIf="!scanning && !manualInput.trim()" mat-icon-button class="btn-success" color="primary"
+            (click)="startScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
             <mat-icon>qr_code_scanner</mat-icon>
         </button>
 
-        <button *ngIf="scanning" mat-icon-button class="btn-danger" color="warn" (click)="stopScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
+        <button *ngIf="scanning" mat-icon-button class="btn-danger" color="warn" (click)="stopScan()"
+            style="margin-bottom: 1.25rem; margin-right: 10px">
             <mat-icon>stop</mat-icon>
         </button>
     </div>
 
     <mat-menu #menu="matMenu">
-        <mat-checkbox *ngFor="let format of availableFormats" (change)="toggleFormat(format.format)" [checked]="allowedFormats.includes(format.format)">
+        <mat-checkbox *ngFor="let format of availableFormats" (change)="toggleFormat(format.format)"
+            [checked]="allowedFormats.includes(format.format)">
             {{ format.name }}
         </mat-checkbox>
     </mat-menu>
@@ -44,23 +48,28 @@
                         <mat-icon>more_vert</mat-icon>
                     </button> -->
                     <!-- Botones de flash y cancelar -->
-                    <button class="btn-primary" mat-icon-button (click)="toggleTorch()" style="margin-bottom: 1.25rem; margin-right: 10px">
+                    <button class="btn-primary" mat-icon-button (click)="toggleTorch()"
+                        style="margin-bottom: 1.25rem; margin-right: 10px">
                         <mat-icon>{{ flashEnabled ? "flash_off" : "flash_on" }}</mat-icon>
                     </button>
-                    <button class="btn-danger" mat-icon-button (click)="stopScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
+                    <button class="btn-danger" mat-icon-button (click)="stopScan()"
+                        style="margin-bottom: 1.25rem; margin-right: 10px">
                         <mat-icon>close</mat-icon>
                     </button>
                 </div>
             </header>
 
             <!-- Componente de escaneo -->
-            <zxing-scanner [torch]="this.flashEnabled" (torchCompatible)="this.onTorchCompatible($event)" (scanSuccess)="('Codigo Escaneado')" [formats]="allowedFormats" [(device)]="selectedCamera" (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="true"></zxing-scanner>
+            <zxing-scanner [torch]="this.flashEnabled" (torchCompatible)="this.onTorchCompatible($event)"
+                (scanSuccess)="('Codigo Escaneado')" [formats]="allowedFormats" [(device)]="selectedCamera"
+                (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="true"></zxing-scanner>
         </div>
     </div>
 </div>
 
 <div fxLayout="row" fxLayoutAlign="start stretch" class="grid-container">
-    <div fxLayout="row" fxLayoutAlign="center center" class="margin-y" style="width: 100%; justify-content: center; align-content: center; align-items: center; display: flex; ">
+    <div fxLayout="row" fxLayoutAlign="center center" class="margin-y"
+        style="width: 100%; justify-content: center; align-content: center; align-items: center; display: flex; ">
         <mat-form-field class="example-form-field w-100">
             <mat-label>Buscar</mat-label>
             <input matInput type="text" [(ngModel)]="this.searchInput" #inputElement (ngModelChange)="this.search()" />
@@ -72,8 +81,8 @@
             <mat-icon>search</mat-icon>
         </button> -->
     </div>
-    <div *ngFor="let item of scannedItems" class="grid-item">
-        <mat-grid-list cols="2" rowHeight="2:1">
+    <div fxLayout="row wrap" fxLayoutGap="16px grid" fxLayoutAlign="start stretch" fxFlexFill>
+        <div *ngFor="let item of scannedItems" fxFlex="25%" fxFlex.md="25%" fxFlex.sm="50%" fxFlex.xs="100%">
             <mat-card class="mat-elevation-z8">
                 <mat-card-content class="text-wrap">
                     <p><strong>Code:</strong> {{ item.data }}</p>
@@ -84,6 +93,7 @@
                     <button mat-button color="warn" (click)="deleteItem(item)">Eliminar</button>
                 </mat-card-actions>
             </mat-card>
-        </mat-grid-list>
+        </div>
     </div>
+
 </div>

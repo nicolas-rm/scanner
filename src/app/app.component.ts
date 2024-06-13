@@ -31,6 +31,7 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BehaviorSubject } from 'rxjs';
 import { FirestoreService } from './services/firestore.service';
+import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 
 interface ScannerData {
     data: string;
@@ -48,17 +49,11 @@ interface ScannerData {
 })
 export class AppComponent implements OnInit {
     title = 'QR & Barcode Scanner';
-
     scannedItems: ScannerData[] = [];
-
     scanning: boolean = false;
-
     manualInput: string = '';
-
     searchInput: string = '';
-
     tryHarder: boolean = false;
-
     flashEnabled: boolean = false;
     torchAvailable$ = new BehaviorSubject<boolean>(false);
 
@@ -77,9 +72,7 @@ export class AppComponent implements OnInit {
     ];
 
     allowedFormats: BarcodeFormat[] = this.availableFormats.map((f) => f.format);
-
     cameras: MediaDeviceInfo[] = [];
-
     selectedCamera!: MediaDeviceInfo;
 
     @ViewChild('inputElement') inputElement!: ElementRef;
@@ -92,7 +85,6 @@ export class AppComponent implements OnInit {
         if (this.inputElement) {
             this.inputElement.nativeElement.focus();
             // Uppercase
-            
         }
     }
 
@@ -113,17 +105,11 @@ export class AppComponent implements OnInit {
     }
 
     async selectCamera(camera: MediaDeviceInfo) {
-        // this.router.navigate([], {
-        //     queryParams: { cameraId: camera.deviceId },
-        //     queryParamsHandling: 'merge',
-        // });
-
         this.selectedCamera = camera;
     }
 
     async handleQrCodeResult(resultString: string) {
         const timestamp = moment().format('YYYY-MM-DD HH:mm A');
-        // this.scannedItems.push({ data: resultString, timestamp });
         this.fireStore.create({ data: resultString.toLocaleUpperCase(), timestamp })
         this.scanning = false; // Stop scanning after receiving a result
     }
@@ -155,9 +141,7 @@ export class AppComponent implements OnInit {
     }
 
     search() {
-
         this.searchInput = this.searchInput.toLocaleUpperCase();
-
         this.fireStore.filter(this.searchInput).subscribe((data) => {
             this.scannedItems = data
         });
@@ -171,11 +155,13 @@ export class AppComponent implements OnInit {
     }
 
     deleteItem(item: ScannerData) {
-        this.fireStore.delete(item.id!).subscribe(() => {});
-        // const index = this.scannedItems.indexOf(item);
-        // if (index !== -1) {
-        //     this.scannedItems.splice(index, 1);
-        // }
+        const dialogRef = this.dialog.open(ConfirmDeleteDialogComponent);
+
+        dialogRef.afterClosed().subscribe(result => {
+            if (result) {
+                this.fireStore.delete(item.id!).subscribe();
+            }
+        });
     }
 
     onTorchCompatible(isCompatible: boolean): void {
@@ -188,6 +174,4 @@ export class AppComponent implements OnInit {
     toggleTorch(): void {
         this.flashEnabled = !this.flashEnabled;
     }
-
-    // Generar qr por codigo
 }
