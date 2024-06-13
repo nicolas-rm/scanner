@@ -27,7 +27,7 @@
     </div>
 
     <mat-menu #menu="matMenu">
-        <mat-checkbox *ngFor="let format of availableFormats" (change)="toggleFormat(format.format)"
+        <mat-checkbox *ngFor="let format of availableFormats" (change)="toggleFormat(format.format)" 
             [checked]="allowedFormats.includes(format.format)">
             {{ format.name }}
         </mat-checkbox>
@@ -63,7 +63,7 @@
             <!-- Componente de escaneo -->
             <zxing-scanner [torch]="this.flashEnabled" (torchCompatible)="this.onTorchCompatible($event)"
                 (scanSuccess)="('Codigo Escaneado')" [formats]="allowedFormats" [(device)]="selectedCamera"
-                (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="true"></zxing-scanner>
+                (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="this.tryHarder"></zxing-scanner>
         </div>
     </div>
 </div>

@@ -117,10 +117,12 @@ export class AppComponent implements OnInit {
     async getVideoInputDevices() {
         const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
         this.cameras = devices.filter((device) => device.kind === 'videoinput');
+        this.tryHarder = true
     }
 
     async selectCamera(camera: MediaDeviceInfo) {
         this.selectedCamera = camera;
+        this.tryHarder = true
     }
 
     async handleQrCodeResult(resultString: string) {
@@ -149,6 +151,8 @@ export class AppComponent implements OnInit {
 
     async stopScan() {
         this.scanning = false;
+        this.tryHarder = false;
+        this.flashEnabled = false;
     }
 
     toggleFormat(format: BarcodeFormat) {
@@ -185,8 +189,8 @@ export class AppComponent implements OnInit {
     search() {
 
         this.searchInput = this.searchInput.trim().toLocaleUpperCase();
-        this.loading = true; // Mostrar spinner al iniciar la búsqueda
         if (this.searchInput.length >= 3) {
+            this.loading = true; // Mostrar spinner al iniciar la búsqueda
             this.fireStore.filter(this.searchInput).subscribe({
                 next: (data) => {
                     this.scannedItems = data;
@@ -197,6 +201,8 @@ export class AppComponent implements OnInit {
                     this.showSnackBar('Error al realizar la búsqueda.');
                 }
             });
+        }else {
+            this.loading = false; // Mostrar spinner al iniciar la carga de datos
         }
     }
 
@@ -239,7 +245,7 @@ export class AppComponent implements OnInit {
 
     private showSnackBar(message: string) {
         this.snackBar.open(message, 'Cerrar', {
-            horizontalPosition: 'center', // Posición horizontal 'start' | 'center' | 'end' | 'left' | 'right'
+            horizontalPosition: 'start', // Posición horizontal 'start' | 'center' | 'end' | 'left' | 'right'
             verticalPosition: 'top',
             duration: 5000, // Duración en milisegundos
         });
