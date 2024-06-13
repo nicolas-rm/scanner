@@ -203,6 +203,16 @@ export class AppComponent implements OnInit {
             });
         }else {
             this.loading = false; // Mostrar spinner al iniciar la carga de datos
+            this.fireStore.getAlls().subscribe({
+                next: (data) => {
+                    this.scannedItems = data;
+                    this.loading = false; // Ocultar spinner cuando se complete la carga de datos
+                },
+                error: (error) => {
+                    this.loading = false; // Ocultar spinner en caso de error
+                    this.showSnackBar('Error al cargar los datos.');
+                }
+            });
         }
     }
 
