@@ -34,6 +34,8 @@ import { FirestoreService } from './services/firestore.service';
 import { ConfirmDeleteDialogComponent } from './confirm-delete-dialog/confirm-delete-dialog.component';
 
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar'; // Importar MatSnackBarModule
+import { ProgressSpinnerMode, MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+
 
 
 interface ScannerData {
@@ -46,7 +48,7 @@ interface ScannerData {
 @Component({
     selector: 'app-root',
     standalone: true,
-    imports: [RouterOutlet, CommonModule, MatButtonModule, MatListModule, MatCardModule, FlexLayoutModule, ZXingScannerModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatFormFieldModule, FormsModule, MatInputModule, ItemDetailsModalComponent, MatSelectModule, MatOptionModule, MatGridListModule, MatToolbarModule, MatSidenavModule, MatSnackBarModule],
+    imports: [RouterOutlet, CommonModule, MatButtonModule, MatListModule, MatCardModule, FlexLayoutModule, ZXingScannerModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatFormFieldModule, FormsModule, MatInputModule, ItemDetailsModalComponent, MatSelectModule, MatOptionModule, MatGridListModule, MatToolbarModule, MatSidenavModule, MatSnackBarModule, MatProgressSpinnerModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
     providers: [FirestoreService],
@@ -60,6 +62,7 @@ export class AppComponent implements OnInit {
     tryHarder: boolean = false;
     flashEnabled: boolean = false;
     torchAvailable$ = new BehaviorSubject<boolean>(false);
+    loading: boolean = false; // Variable de estado para el spinner
 
     availableFormats = [
         { format: BarcodeFormat.QR_CODE, name: 'QR Code' },
@@ -96,10 +99,18 @@ export class AppComponent implements OnInit {
         const inputs = async () => await this.getVideoInputDevices()
         inputs()
 
+        this.loading = true; // Mostrar spinner al iniciar la carga de datos
         this.manualInput = this.manualInput.toLocaleUpperCase();
 
-        this.fireStore.getAlls().subscribe((data) => {
-            this.scannedItems = data;
+        this.fireStore.getAlls().subscribe({
+            next: (data) => {
+                this.scannedItems = data;
+                this.loading = false; // Ocultar spinner cuando se complete la carga de datos
+            },
+            error: (error) => {
+                this.loading = false; // Ocultar spinner en caso de error
+                this.showSnackBar('Error al cargar los datos.');
+            }
         });
     }
 
@@ -120,7 +131,14 @@ export class AppComponent implements OnInit {
             return;
         }
 
-        this.fireStore.create({ data: resultString.toLocaleUpperCase(), timestamp })
+        this.fireStore.create({ data: resultString.toLocaleUpperCase(), timestamp }).subscribe({
+            next: () => {
+                this.scanning = false; // Stop scanning after receiving a result
+            },
+            error: (error) => {
+                this.showSnackBar('Error al guardar el código.');
+            }
+        });
         this.scanning = false; // Stop scanning after receiving a result
     }
 
@@ -152,16 +170,34 @@ export class AppComponent implements OnInit {
                 return;
             }
 
-            this.fireStore.create({ data: this.manualInput.toLocaleUpperCase(), timestamp })
+            this.fireStore.create({ data: this.manualInput.toLocaleUpperCase(), timestamp }).subscribe({
+                next: () => {
+                    this.manualInput = '';
+                },
+                error: (error) => {
+                    this.showSnackBar('Error al guardar el código.');
+                }
+            });
             this.manualInput = '';
         }
     }
 
     search() {
-        this.searchInput = this.searchInput.toLocaleUpperCase();
-        this.fireStore.filter(this.searchInput).subscribe((data) => {
-            this.scannedItems = data
-        });
+
+        this.searchInput = this.searchInput.trim().toLocaleUpperCase();
+        this.loading = true; // Mostrar spinner al iniciar la búsqueda
+        if (this.searchInput.length >= 3) {
+            this.fireStore.filter(this.searchInput).subscribe({
+                next: (data) => {
+                    this.scannedItems = data;
+                    this.loading = false; // Ocultar spinner cuando se complete la búsqueda
+                },
+                error: (error) => {
+                    this.loading = false; // Ocultar spinner en caso de error
+                    this.showSnackBar('Error al realizar la búsqueda.');
+                }
+            });
+        }
     }
 
     viewItem(item: ScannerData) {
@@ -176,7 +212,16 @@ export class AppComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                this.fireStore.delete(item.id!).subscribe();
+                this.loading = true; // Mostrar spinner al iniciar la eliminación
+                this.fireStore.delete(item.id!).subscribe({
+                    next: () => {
+                        this.loading = false; // Ocultar spinner cuando se complete la eliminación
+                    },
+                    error: (error) => {
+                        this.loading = false; // Ocultar spinner en caso de error
+                        this.showSnackBar('Error al eliminar el código.');
+                    }
+                });
             }
         });
     }
