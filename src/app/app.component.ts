@@ -90,7 +90,7 @@ export class AppComponent implements OnInit {
 
     ngOnInit() {
         this.fireStore.getAlls().subscribe((data) => {
-            this.scannedItems = data; 
+            this.scannedItems = data;
         });
     }
 
