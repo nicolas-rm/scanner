@@ -1,4 +1,4 @@
-import { Component, NgModule } from '@angular/core';
+import { Component, ElementRef, NgModule, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import moment from 'moment';
 
@@ -31,126 +31,140 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
 import { routes } from './app.routes';
 
+import { MatGridListModule } from '@angular/material/grid-list';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { BehaviorSubject } from 'rxjs';
+
 @Component({
-  selector: 'app-root',
-  standalone: true,
-  imports: [
-    RouterOutlet,
-    CommonModule,
-    // BrowserModule,
-    // BrowserAnimationsModule,
-    MatButtonModule,
-    MatListModule,
-    MatCardModule,
-    FlexLayoutModule,
-    ZXingScannerModule,
-    MatMenuModule,
-    MatIconModule,
-    MatCheckboxModule,
-    MatFormFieldModule,
-    FormsModule,
-    MatInputModule,
-    ItemDetailsModalComponent,
-    MatSelectModule,
-    MatOptionModule,
-  ],
-  templateUrl: './app.component.html',
-  styleUrl: './app.component.scss',
+    selector: 'app-root',
+    standalone: true,
+    imports: [RouterOutlet, CommonModule, MatButtonModule, MatListModule, MatCardModule, FlexLayoutModule, ZXingScannerModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatFormFieldModule, FormsModule, MatInputModule, ItemDetailsModalComponent, MatSelectModule, MatOptionModule, MatGridListModule, MatToolbarModule, MatSidenavModule],
+    templateUrl: './app.component.html',
+    styleUrl: './app.component.scss',
 })
 export class AppComponent {
-  title = 'QR & Barcode Scanner';
-  scannedItems: { data: string; timestamp: string }[] = [];
-  scanning: boolean = false;
-  manualInput: string = '';
-  availableFormats = [
-    { format: BarcodeFormat.QR_CODE, name: 'QR Code' },
-    { format: BarcodeFormat.DATA_MATRIX, name: 'Data Matrix' },
-    { format: BarcodeFormat.AZTEC, name: 'Aztec' },
-    { format: BarcodeFormat.CODE_128, name: 'Code 128' },
-    { format: BarcodeFormat.CODE_39, name: 'Code 39' },
-    { format: BarcodeFormat.EAN_13, name: 'EAN-13' },
-    { format: BarcodeFormat.EAN_8, name: 'EAN-8' },
-    { format: BarcodeFormat.ITF, name: 'ITF' },
-    { format: BarcodeFormat.UPC_A, name: 'UPC-A' },
-    { format: BarcodeFormat.UPC_E, name: 'UPC-E' },
-    { format: BarcodeFormat.PDF_417, name: 'PDF 417' },
-  ];
-  allowedFormats: BarcodeFormat[] = this.availableFormats.map((f) => f.format);
-  cameras: MediaDeviceInfo[] = [];
-  selectedCamera!: MediaDeviceInfo;
+    title = 'QR & Barcode Scanner';
 
-  constructor(public dialog: MatDialog, private router: Router) {}
+    scannedItems: { data: string; timestamp: string }[] = [];
 
-  async ngOnInit() {
-    await this.getVideoInputDevices();
-  }
+    scanning: boolean = false;
 
-  async getVideoInputDevices() {
-    const devices: MediaDeviceInfo[] =
-      await navigator.mediaDevices.enumerateDevices();
-    this.cameras = devices.filter((device) => device.kind === 'videoinput');
-    if (this.cameras.length > 0) {
-      // Verificar cual tiene flash
-      const cameraWithFlash = this.cameras.find((camera) =>
-        camera.label.toLowerCase().includes('back')
-      );
-      this.selectedCamera = cameraWithFlash || this.cameras[0];
+    manualInput: string = '';
+
+    tryHarder: boolean = false;
+
+    flashEnabled: boolean = false;
+    torchAvailable$ = new BehaviorSubject<boolean>(false);
+
+    availableFormats = [
+        { format: BarcodeFormat.QR_CODE, name: 'QR Code' },
+        { format: BarcodeFormat.DATA_MATRIX, name: 'Data Matrix' },
+        { format: BarcodeFormat.AZTEC, name: 'Aztec' },
+        { format: BarcodeFormat.CODE_128, name: 'Code 128' },
+        { format: BarcodeFormat.CODE_39, name: 'Code 39' },
+        { format: BarcodeFormat.EAN_13, name: 'EAN-13' },
+        { format: BarcodeFormat.EAN_8, name: 'EAN-8' },
+        { format: BarcodeFormat.ITF, name: 'ITF' },
+        { format: BarcodeFormat.UPC_A, name: 'UPC-A' },
+        { format: BarcodeFormat.UPC_E, name: 'UPC-E' },
+        { format: BarcodeFormat.PDF_417, name: 'PDF 417' },
+    ];
+
+    allowedFormats: BarcodeFormat[] = this.availableFormats.map((f) => f.format);
+
+    cameras: MediaDeviceInfo[] = [];
+
+    selectedCamera!: MediaDeviceInfo;
+
+    @ViewChild('inputElement') inputElement!: ElementRef;
+
+    ngAfterViewInit() {
+        // this.inputElement.nativeElement.focus();
     }
-  }
 
-  async selectCamera(camera: MediaDeviceInfo) {
-    this.router.navigate([], {
-      queryParams: { cameraId: camera.deviceId },
-      queryParamsHandling: 'merge'
-    });
-  }
-
-  async handleQrCodeResult(resultString: string) {
-    const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
-    this.scannedItems.push({ data: resultString, timestamp });
-    this.scanning = false; // Stop scanning after receiving a result
-  }
-
-  async startScan() {
-    if (this.selectedCamera) {
-      this.scanning = true;
-    } else {
-      alert('No se ha seleccionado ninguna cámara.');
+    constructor(public dialog: MatDialog, private router: Router) {
+        if (this.inputElement) {
+            this.inputElement.nativeElement.focus();
+        }
     }
-  }
 
-  async stopScan() {
-    this.scanning = false;
-  }
-
-  toggleFormat(format: BarcodeFormat) {
-    const index = this.allowedFormats.indexOf(format);
-    if (index === -1) {
-      this.allowedFormats.push(format);
-    } else {
-      this.allowedFormats.splice(index, 1);
+    async ngOnInit() {
+        await this.getVideoInputDevices();
     }
-  }
 
-  addManualInput() {
-    if (this.manualInput.trim()) {
-      const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
-      this.scannedItems.push({ data: this.manualInput, timestamp });
-      this.manualInput = '';
+    async getVideoInputDevices() {
+        const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
+        this.cameras = devices.filter((device) => device.kind === 'videoinput');
     }
-  }
 
-  viewItem(item: { data: string; timestamp: string }) {
-    const dialogRef = this.dialog.open(ItemDetailsModalComponent, {
-      width: '400px',
-      data: item,
-    });
-  }
+    async selectCamera(camera: MediaDeviceInfo) {
+        // this.router.navigate([], {
+        //     queryParams: { cameraId: camera.deviceId },
+        //     queryParamsHandling: 'merge',
+        // });
 
-  deleteItem(item: { data: string; timestamp: string }) {
-    const index = this.scannedItems.indexOf(item);
-    if (index !== -1) {
-      this.scannedItems.splice(index, 1);
+        this.selectedCamera = camera;
     }
-  }
+
+    async handleQrCodeResult(resultString: string) {
+        const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
+        this.scannedItems.push({ data: resultString, timestamp });
+        this.scanning = false; // Stop scanning after receiving a result
+    }
+
+    async startScan() {
+        this.scanning = true;
+        this.tryHarder = true;
+    }
+
+    async stopScan() {
+        this.scanning = false;
+    }
+
+    toggleFormat(format: BarcodeFormat) {
+        const index = this.allowedFormats.indexOf(format);
+        if (index === -1) {
+            this.allowedFormats.push(format);
+        } else {
+            this.allowedFormats.splice(index, 1);
+        }
+    }
+
+    addManualInput() {
+        if (this.manualInput.trim()) {
+            const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
+            this.scannedItems.push({ data: this.manualInput, timestamp });
+            this.manualInput = '';
+        }
+    }
+
+    viewItem(item: { data: string; timestamp: string }) {
+        const dialogRef = this.dialog.open(ItemDetailsModalComponent, {
+            width: '400px',
+            data: item,
+        });
+    }
+
+    deleteItem(item: { data: string; timestamp: string }) {
+        const index = this.scannedItems.indexOf(item);
+        if (index !== -1) {
+            this.scannedItems.splice(index, 1);
+        }
+    }
+
+    onTorchCompatible(isCompatible: boolean): void {
+        this.torchAvailable$.next(isCompatible || false);
+        if (!isCompatible) {
+            this.flashEnabled = false;
+        }
+    }
+
+    toggleTorch(): void {
+        this.flashEnabled = !this.flashEnabled;
+    }
+
+    // Generar qr por codigo
+    
+
 }

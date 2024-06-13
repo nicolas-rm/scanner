@@ -1,102 +1,79 @@
-<div fxLayout="column" fxLayoutAlign="center center" class="padding-2 margin-1">
-  <h1 class="text-center">{{ title }}</h1>
+<div fxLayout="column" fxLayoutAlign="center center">
+    <!-- Input de código manual -->
+    <div fxLayout="row" fxLayoutAlign="center center" class="margin-y" style="width: 100%">
+        <mat-form-field class="example-form-field w-100">
+            <mat-label>Codigo</mat-label>
+            <input matInput type="text" [(ngModel)]="manualInput" #inputElement />
+            <button matSuffix mat-icon-button aria-label="Clear" *ngIf="manualInput" (click)="manualInput = ''">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
 
-  <div fxLayout="row" fxLayoutAlign="center center" class="margin-y">
-    <div fxLayout="row" fxLayoutAlign="center center" class="margin-y">
-      <mat-form-field class="example-form-field w-100" style="width: 100%;">
-        <mat-label>Codigo</mat-label>
-        <input matInput type="text" [(ngModel)]="manualInput" />
-        <button
-          matSuffix
-          mat-icon-button
-          aria-label="Clear"
-          *ngIf="manualInput"
-          (click)="manualInput = ''"
-        >
-          <mat-icon>close</mat-icon>
+        <button *ngIf="manualInput.trim()" mat-icon-button class="btn-success" color="primary" (click)="addManualInput()" style="margin-bottom: 1.25rem; margin-right: 10px">
+            <mat-icon>add</mat-icon>
         </button>
-      </mat-form-field>
+        <!-- Botones de escaneo -->
+        <button *ngIf="!scanning && !manualInput.trim()" mat-icon-button class="btn-success" color="primary" (click)="startScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
+            <mat-icon>qr_code_scanner</mat-icon>
+        </button>
 
-      <button
-        *ngIf="manualInput.trim()"
-        mat-icon-button
-        class="btn-success margin-x"
-        color="primary"
-        (click)="addManualInput()"
-      >
-        <mat-icon>add</mat-icon>
-      </button>
+        <button *ngIf="scanning" mat-icon-button class="btn-danger" color="warn" (click)="stopScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
+            <mat-icon>stop</mat-icon>
+        </button>
     </div>
 
-    <div
-      fxLayout="row"
-      fxLayoutAlign="center center"
-      *ngIf="!manualInput.trim()"
-    >
-      <button
-        *ngIf="!scanning"
-        mat-icon-button
-        class="btn-success margin-x"
-        color="primary"
-        (click)="startScan()"
-      >
-        <mat-icon>qr_code_scanner</mat-icon>
-      </button>
+    <mat-menu #menu="matMenu">
+        <mat-checkbox *ngFor="let format of availableFormats" (change)="toggleFormat(format.format)" [checked]="allowedFormats.includes(format.format)">
+            {{ format.name }}
+        </mat-checkbox>
+    </mat-menu>
 
-      <button
-        *ngIf="scanning"
-        mat-icon-button
-        class="btn-danger margin-x"
-        color="warn"
-        (click)="stopScan()"
-      >
-        <mat-icon>stop</mat-icon>
-      </button>
+    <div *ngIf="scanning" class="fullscreen-overlay">
+        <div class="overlay-content">
+            <!-- Encabezado -->
+            <header class="overlay-header">
+                <!-- Componente de selección de cámara -->
+                <div class="camera-selector">
+                    <mat-form-field appearance="fill" style="width: 100%">
+                        <mat-label>Seleccionar cámara</mat-label>
+                        <mat-select [value]="selectedCamera" (selectionChange)="selectCamera($event.value)" >
+                            <mat-option *ngFor="let camera of cameras" [value]="camera">{{ camera.label }}</mat-option>
+                        </mat-select>
+                    </mat-form-field>
+                    <!-- <button class="btn-primary" mat-icon-button [matMenuTriggerFor]="menu" style="margin-bottom: 1.25rem; margin-right: 10px">
+                        <mat-icon>more_vert</mat-icon>
+                    </button> -->
+                    <!-- Botones de flash y cancelar -->
+                    <button class="btn-primary" mat-icon-button (click)="toggleTorch()" style="margin-bottom: 1.25rem; margin-right: 10px">
+                        <mat-icon>{{ flashEnabled ? 'flash_off' : 'flash_on' }}</mat-icon>
+                    </button>
+                    <button class="btn-danger" mat-icon-button (click)="stopScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </div>
+            </header>
 
-      <button class="btn-primary" mat-icon-button [matMenuTriggerFor]="menu">
-        <mat-icon>settings</mat-icon>
-      </button>
+            <!-- Componente de escaneo -->
+            <zxing-scanner [torch]="this.flashEnabled" (torchCompatible)="this.onTorchCompatible($event)" (scanSuccess)="'Codigo Escaneado'" [formats]="allowedFormats" [(device)]="selectedCamera" (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="true"></zxing-scanner>
+        </div>
     </div>
-  </div>
+</div>
 
-  <mat-menu #menu="matMenu">
-    <mat-checkbox
-      *ngFor="let format of availableFormats"
-      (change)="toggleFormat(format.format)"
-      [checked]="allowedFormats.includes(format.format)"
-    >
-      {{ format.name }}
-    </mat-checkbox>
-  </mat-menu>
+<div fxLayout="row" fxLayoutAlign="start stretch" class="grid-container">
+    <div *ngFor="let item of scannedItems" class="grid-item">
+        <mat-grid-list cols="2" rowHeight="2:1">
+            <mat-card class="mat-elevation-z8">
+                <mat-card-content class="text-wrap">
+                    <p><strong>Code:</strong> {{ item.data }}</p>
+                    <p><strong>Timestamp:</strong> {{ item.timestamp }}</p>
+                </mat-card-content>
+                <mat-card-actions>
+                    <button mat-button color="accent" (click)="viewItem(item)">Detalles</button>
+                    <button mat-button color="warn" (click)="deleteItem(item)">Eliminar</button>
+                    <button mat-button color="success" (click)="deleteItem(item)">Generar</button>
 
-  <mat-form-field appearance="fill" style="width: 100%;">
-    <mat-label>Seleccionar cámara</mat-label>
-    <mat-select [(ngModel)]="selectedCamera" (selectionChange)="selectCamera($event.value)">
-      <mat-option *ngFor="let camera of cameras" [value]="camera">{{ camera.label }}</mat-option>
-    </mat-select>
-  </mat-form-field>
-
-  <zxing-scanner
-    *ngIf="scanning"
-    [formats]="allowedFormats"
-    [(device)]="selectedCamera"
-    (scanSuccess)="handleQrCodeResult($event)"
-    [autostart]="scanning"
-    [tryHarder]="true"
-  ></zxing-scanner>
-
-  <div *ngFor="let item of scannedItems">
-    <mat-card style="margin-top: 1rem">
-      <mat-card-content>
-        <p><strong>Code:</strong> {{ item.data }}</p>
-        <p><strong>Timestamp:</strong> {{ item.timestamp }}</p>
-      </mat-card-content>
-      <mat-card-actions>
-        <button mat-button color="accent" (click)="viewItem(item)">View</button>
-        <button mat-button color="warn" (click)="deleteItem(item)">
-          Delete
-        </button>
-      </mat-card-actions>
-    </mat-card>
-  </div>
+                </mat-card-actions>
+            </mat-card>
+        </mat-grid-list>
+    </div>
 </div>

@@ -25,16 +25,16 @@
 //   margin: 0 20px;
 // }
 
-mat-card {
-  width: 80%;
-  margin: 0 auto;
-}
+// mat-card {
+//   width: 80%;
+//   margin: 0 auto;
+// }
 
-zxing-scanner {
-  width: 100%;
-  max-width: 500px;
-  margin-top: 20px;
-}
+// zxing-scanner {
+//   width: 100%;
+//   max-width: 500px;
+//   margin-top: 20px;
+// }
 
 mat-checkbox {
   display: block;
@@ -185,13 +185,111 @@ mat-checkbox {
   height: 100%;
 }
 
-// mat-card
-mat-card {
+// // mat-card
+// mat-card {
+//   width: 100%;
+//   margin: 0 auto;
+// }
+
+// // mat-card-content
+// mat-card-content {
+//   width: 100%;
+// }
+
+.fullscreen-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
   width: 100%;
-  margin: 0 auto;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8); /* Color de fondo semi-transparente */
+  z-index: 1000; /* Asegúrate de que esté por encima de otros elementos */
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 
-// mat-card-content
-mat-card-content {
+.overlay-content {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* Alineación en la parte superior */
+  align-items: center;
+  height: 100%;
   width: 100%;
+}
+
+/* Estilos para el encabezado */
+.overlay-header {
+  width: 100%;
+  padding: 20px; /* Ajusta el padding según sea necesario */
+  box-sizing: border-box; /* Incluye el padding en el ancho total */
+  background-color: #fff; /* Color de fondo del encabezado */
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+// overlay-footer
+.overlay-footer {
+  width: 100%;
+  padding: 20px; /* Ajusta el padding según sea necesario */
+  box-sizing: border-box; /* Incluye el padding en el ancho total */
+  background-color: #fff; /* Color de fondo del pie de página */
+  position: absolute;
+  bottom: 0;
+  left: 0;
+}
+
+/* Estilos para el selector de cámaras */
+.camera-selector {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  z-index: 1001; /* Asegúrate de que esté por encima de otros elementos */
+  position: relative; /* Asegúrate de que los elementos absolutamente posicionados dentro de él respeten su contexto de posicionamiento */
+}
+
+.camera-selector mat-form-field {
+  flex-grow: 1; /* Ocupa todo el espacio disponible */
+}
+
+.camera-selector .btn-primary {
+  margin-left: 20px; /* Espacio entre el selector de cámaras y el botón de menú */
+}
+
+// Text wrap
+.text-wrap {
+  white-space: normal;
+}
+
+
+// (Poner espacio entre botones e input
+mat-form-field {
+    margin-right: 10px;
+    margin-left: 10px;
+}
+
+.grid-container {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    gap: 1px; /* Espacio entre los ítems */
+}
+
+.grid-item {
+    flex: 1 1 calc(33% - 20px); /* Ajusta el tamaño de los ítems y deja espacio */
+    // box-shadow: 0 2px 5px rgba(0,0,0,0.2); /* Opcional, para dar un efecto de sombra */
+    margin: 10px;
+}
+
+.mat-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+zxing-scanner {
+    width: 100%;
+    height: 100vh;
 }
