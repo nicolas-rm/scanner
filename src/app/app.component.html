@@ -36,7 +36,7 @@
                 <div class="camera-selector">
                     <mat-form-field appearance="fill" style="width: 100%">
                         <mat-label>Seleccionar cámara</mat-label>
-                        <mat-select [value]="selectedCamera" (selectionChange)="selectCamera($event.value)" >
+                        <mat-select [value]="selectedCamera" (selectionChange)="selectCamera($event.value)">
                             <mat-option *ngFor="let camera of cameras" [value]="camera">{{ camera.label }}</mat-option>
                         </mat-select>
                     </mat-form-field>
@@ -45,7 +45,7 @@
                     </button> -->
                     <!-- Botones de flash y cancelar -->
                     <button class="btn-primary" mat-icon-button (click)="toggleTorch()" style="margin-bottom: 1.25rem; margin-right: 10px">
-                        <mat-icon>{{ flashEnabled ? 'flash_off' : 'flash_on' }}</mat-icon>
+                        <mat-icon>{{ flashEnabled ? "flash_off" : "flash_on" }}</mat-icon>
                     </button>
                     <button class="btn-danger" mat-icon-button (click)="stopScan()" style="margin-bottom: 1.25rem; margin-right: 10px">
                         <mat-icon>close</mat-icon>
@@ -54,24 +54,35 @@
             </header>
 
             <!-- Componente de escaneo -->
-            <zxing-scanner [torch]="this.flashEnabled" (torchCompatible)="this.onTorchCompatible($event)" (scanSuccess)="'Codigo Escaneado'" [formats]="allowedFormats" [(device)]="selectedCamera" (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="true"></zxing-scanner>
+            <zxing-scanner [torch]="this.flashEnabled" (torchCompatible)="this.onTorchCompatible($event)" (scanSuccess)="('Codigo Escaneado')" [formats]="allowedFormats" [(device)]="selectedCamera" (scanSuccess)="handleQrCodeResult($event)" [autostart]="scanning" [tryHarder]="true"></zxing-scanner>
         </div>
     </div>
 </div>
 
 <div fxLayout="row" fxLayoutAlign="start stretch" class="grid-container">
+    <div fxLayout="row" fxLayoutAlign="center center" class="margin-y" style="width: 100%; justify-content: center; align-content: center; align-items: center; display: flex; ">
+        <mat-form-field class="example-form-field w-100">
+            <mat-label>Buscar</mat-label>
+            <input matInput type="text" [(ngModel)]="this.searchInput" #inputElement />
+            <button matSuffix mat-icon-button aria-label="Clear" (click)="searchInput = ''">
+                <mat-icon>close</mat-icon>
+            </button>
+        </mat-form-field>
+        <button mat-icon-button class="btn-success" color="primary" (click)="search()" style="margin-bottom: 1.25rem; margin-right: 10px">
+            <mat-icon>search</mat-icon>
+        </button>
+    </div>
     <div *ngFor="let item of scannedItems" class="grid-item">
         <mat-grid-list cols="2" rowHeight="2:1">
             <mat-card class="mat-elevation-z8">
                 <mat-card-content class="text-wrap">
                     <p><strong>Code:</strong> {{ item.data }}</p>
-                    <p><strong>Timestamp:</strong> {{ item.timestamp }}</p>
+                    <p><strong>Creado:</strong> {{ item.timestamp }}</p>
                 </mat-card-content>
                 <mat-card-actions>
                     <button mat-button color="accent" (click)="viewItem(item)">Detalles</button>
                     <button mat-button color="warn" (click)="deleteItem(item)">Eliminar</button>
                     <button mat-button color="success" (click)="deleteItem(item)">Generar</button>
-
                 </mat-card-actions>
             </mat-card>
         </mat-grid-list>

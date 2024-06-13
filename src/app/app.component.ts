@@ -52,6 +52,8 @@ export class AppComponent {
 
     manualInput: string = '';
 
+    searchInput: string = '';
+
     tryHarder: boolean = false;
 
     flashEnabled: boolean = false;
@@ -139,6 +141,10 @@ export class AppComponent {
         }
     }
 
+    search() {
+        
+    }
+
     viewItem(item: { data: string; timestamp: string }) {
         const dialogRef = this.dialog.open(ItemDetailsModalComponent, {
             width: '400px',
@@ -165,6 +171,4 @@ export class AppComponent {
     }
 
     // Generar qr por codigo
-    
-
 }
