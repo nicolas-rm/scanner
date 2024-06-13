@@ -89,6 +89,8 @@ export class AppComponent implements OnInit {
     }
 
     ngOnInit() {
+        const inputs = async () => await this.getVideoInputDevices()
+        inputs()
         this.fireStore.getAlls().subscribe((data) => {
             this.scannedItems = data;
         });
