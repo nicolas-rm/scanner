@@ -1,9 +1,10 @@
-<h2 mat-dialog-title>Item Details</h2>
+<h2 mat-dialog-title>Detalles</h2>
 <div mat-dialog-content>
   <p><strong>Code:</strong> {{ data.data }}</p>
-  <p><strong>Timestamp:</strong> {{ data.timestamp }}</p>
+  <p><strong>Creado:</strong> {{ data.timestamp }}</p>
 </div>
 <div mat-dialog-actions>
   <!-- <button mat-button color="warn">Warn</button> -->
-  <button mat-button color="warn" [mat-dialog-close]="true">Close</button>
+  <button mat-button color="accent">Guardar</button>
+  <button mat-button color="warn" [mat-dialog-close]="true">Cerrar</button>
 </div>

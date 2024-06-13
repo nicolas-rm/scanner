@@ -32,6 +32,12 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { BehaviorSubject } from 'rxjs';
 import { FirestoreService } from './services/firestore.service';
 
+interface ScannerData {
+    data: string;
+    timestamp: string;
+    id?: string;
+}
+
 @Component({
     selector: 'app-root',
     standalone: true,
@@ -43,7 +49,7 @@ import { FirestoreService } from './services/firestore.service';
 export class AppComponent implements OnInit {
     title = 'QR & Barcode Scanner';
 
-    scannedItems: { data: string; timestamp: string }[] = [];
+    scannedItems: ScannerData[] = [];
 
     scanning: boolean = false;
 
@@ -85,12 +91,17 @@ export class AppComponent implements OnInit {
     constructor(public dialog: MatDialog, private fireStore: FirestoreService) {
         if (this.inputElement) {
             this.inputElement.nativeElement.focus();
+            // Uppercase
+            
         }
     }
 
     ngOnInit() {
         const inputs = async () => await this.getVideoInputDevices()
         inputs()
+
+        this.manualInput = this.manualInput.toLocaleUpperCase();
+
         this.fireStore.getAlls().subscribe((data) => {
             this.scannedItems = data;
         });
@@ -111,9 +122,9 @@ export class AppComponent implements OnInit {
     }
 
     async handleQrCodeResult(resultString: string) {
-        const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
+        const timestamp = moment().format('YYYY-MM-DD HH:mm A');
         // this.scannedItems.push({ data: resultString, timestamp });
-        this.fireStore.create({ data: resultString, timestamp })
+        this.fireStore.create({ data: resultString.toLocaleUpperCase(), timestamp })
         this.scanning = false; // Stop scanning after receiving a result
     }
 
@@ -137,28 +148,34 @@ export class AppComponent implements OnInit {
 
     addManualInput() {
         if (this.manualInput.trim()) {
-            const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
-            // this.scannedItems.push({ data: this.manualInput, timestamp });
+            const timestamp = moment().format('YYYY-MM-DD HH:mm A');
+            this.fireStore.create({ data: this.manualInput.toLocaleUpperCase(), timestamp })
             this.manualInput = '';
         }
     }
 
     search() {
 
+        this.searchInput = this.searchInput.toLocaleUpperCase();
+
+        this.fireStore.filter(this.searchInput).subscribe((data) => {
+            this.scannedItems = data
+        });
     }
 
-    viewItem(item: { data: string; timestamp: string }) {
+    viewItem(item: ScannerData) {
         const dialogRef = this.dialog.open(ItemDetailsModalComponent, {
             width: '400px',
             data: item,
         });
     }
 
-    deleteItem(item: { data: string; timestamp: string }) {
-        const index = this.scannedItems.indexOf(item);
-        if (index !== -1) {
-            this.scannedItems.splice(index, 1);
-        }
+    deleteItem(item: ScannerData) {
+        this.fireStore.delete(item.id!).subscribe(() => {});
+        // const index = this.scannedItems.indexOf(item);
+        // if (index !== -1) {
+        //     this.scannedItems.splice(index, 1);
+        // }
     }
 
     onTorchCompatible(isCompatible: boolean): void {

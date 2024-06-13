@@ -63,6 +63,23 @@ export class FirestoreService {
         );
     }
 
+    // Obtener documentos de scanner por su campo data (Like)
+    filter(searchString: string): Observable<ScannerData[]> {
+        return this.fireStore.collection<ScannerData>(this.collection, ref =>
+            ref.where('data', '>=', searchString)
+                .where('data', '<=', searchString + '\uf8ff') // \uf8ff es un carácter de fin Unicode alto
+        ).snapshotChanges().pipe(
+            map(actions =>
+                actions.map(action => {
+                    const data = action.payload.doc.data() as ScannerData;
+                    const id = action.payload.doc.id;
+                    return { id, ...data } as ScannerData;
+                })
+            ),
+            catchError(error => throwError(() => error))
+        );
+    }
+
     // Actualizar un documento de scanner
     update(scanner: ScannerData): Observable<ScannerData> {
         const { id, ...updatedProject } = scanner;

@@ -63,14 +63,14 @@
     <div fxLayout="row" fxLayoutAlign="center center" class="margin-y" style="width: 100%; justify-content: center; align-content: center; align-items: center; display: flex; ">
         <mat-form-field class="example-form-field w-100">
             <mat-label>Buscar</mat-label>
-            <input matInput type="text" [(ngModel)]="this.searchInput" #inputElement />
+            <input matInput type="text" [(ngModel)]="this.searchInput" #inputElement (ngModelChange)="this.search()" />
             <button matSuffix mat-icon-button aria-label="Clear" (click)="searchInput = ''">
                 <mat-icon>close</mat-icon>
             </button>
         </mat-form-field>
-        <button mat-icon-button class="btn-success" color="primary" (click)="search()" style="margin-bottom: 1.25rem; margin-right: 10px">
+        <!-- <button mat-icon-button class="btn-success" color="primary" (click)="search()" style="margin-bottom: 1.25rem; margin-right: 10px">
             <mat-icon>search</mat-icon>
-        </button>
+        </button> -->
     </div>
     <div *ngFor="let item of scannedItems" class="grid-item">
         <mat-grid-list cols="2" rowHeight="2:1">
@@ -82,7 +82,6 @@
                 <mat-card-actions>
                     <button mat-button color="accent" (click)="viewItem(item)">Detalles</button>
                     <button mat-button color="warn" (click)="deleteItem(item)">Eliminar</button>
-                    <button mat-button color="success" (click)="deleteItem(item)">Generar</button>
                 </mat-card-actions>
             </mat-card>
         </mat-grid-list>

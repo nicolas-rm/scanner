@@ -37,8 +37,3 @@ export const appConfig: ApplicationConfig = {
         importProvidersFrom(AngularFirestore),
     ],
 };
-
-/*
-provideFirebaseApp(() => initializeApp({ projectId: 'ngx-qr-scanner', appId: '1:433743684669:web:a026009568af5c74aeb654', storageBucket: 'ngx-qr-scanner.appspot.com', apiKey: 'AIzaSyDsioBhqFy87gwD7O_1d3U0f3KX82TKplw', authDomain: 'ngx-qr-scanner.firebaseapp.com', messagingSenderId: '433743684669' })), 
-        provideFirestore(() => getFirestore())
-         */
