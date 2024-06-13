@@ -1,9 +1,7 @@
-import { Component, ElementRef, NgModule, ViewChild } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import moment from 'moment';
 
-// import { BrowserModule } from '@angular/platform-browser';
-// import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatButtonModule } from '@angular/material/button';
 import { MatListModule } from '@angular/material/list';
 import { MatCardModule } from '@angular/material/card';
@@ -14,8 +12,6 @@ import { CommonModule } from '@angular/common';
 
 import { BarcodeFormat } from '@zxing/library';
 
-import { BrowserModule } from '@angular/platform-browser';
-import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -29,12 +25,12 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { MatSelectModule } from '@angular/material/select';
 import { MatOptionModule } from '@angular/material/core';
-import { routes } from './app.routes';
 
 import { MatGridListModule } from '@angular/material/grid-list';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatSidenavModule } from '@angular/material/sidenav';
 import { BehaviorSubject } from 'rxjs';
+import { FirestoreService } from './services/firestore.service';
 
 @Component({
     selector: 'app-root',
@@ -42,6 +38,7 @@ import { BehaviorSubject } from 'rxjs';
     imports: [RouterOutlet, CommonModule, MatButtonModule, MatListModule, MatCardModule, FlexLayoutModule, ZXingScannerModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatFormFieldModule, FormsModule, MatInputModule, ItemDetailsModalComponent, MatSelectModule, MatOptionModule, MatGridListModule, MatToolbarModule, MatSidenavModule],
     templateUrl: './app.component.html',
     styleUrl: './app.component.scss',
+    providers: [FirestoreService],
 })
 export class AppComponent {
     title = 'QR & Barcode Scanner';
@@ -85,7 +82,7 @@ export class AppComponent {
         // this.inputElement.nativeElement.focus();
     }
 
-    constructor(public dialog: MatDialog, private router: Router) {
+    constructor(public dialog: MatDialog, private fireStore: FirestoreService) {
         if (this.inputElement) {
             this.inputElement.nativeElement.focus();
         }
@@ -112,6 +109,7 @@ export class AppComponent {
     async handleQrCodeResult(resultString: string) {
         const timestamp = moment().format('YYYY-MM-DD HH:mm:ss');
         this.scannedItems.push({ data: resultString, timestamp });
+        this.fireStore.create({ data: resultString, timestamp })
         this.scanning = false; // Stop scanning after receiving a result
     }
 
@@ -142,7 +140,7 @@ export class AppComponent {
     }
 
     search() {
-        
+
     }
 
     viewItem(item: { data: string; timestamp: string }) {
