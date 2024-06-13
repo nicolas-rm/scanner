@@ -87,6 +87,7 @@
                 <mat-card-content class="text-wrap">
                     <p><strong>Code:</strong> {{ item.data }}</p>
                     <p><strong>Creado:</strong> {{ item.timestamp }}</p>
+                    <p *ngIf="item.description"><strong>Descripcion:</strong> {{ item.description }}</p>
                 </mat-card-content>
                 <mat-card-actions>
                     <button mat-button color="accent" (click)="viewItem(item)">Detalles</button>

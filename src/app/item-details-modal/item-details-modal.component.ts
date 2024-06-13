@@ -14,6 +14,7 @@ interface ScannerData {
   data: string;
   timestamp: string;
   id?: string;
+  description?: string;
 }
 
 @Component({
@@ -47,6 +48,11 @@ export class ItemDetailsModalComponent implements OnInit {
   }
 
   save(): void {
+    const data = {
+      data: this.editableData.data.toLocaleUpperCase(),
+      timestamp: this.editableData.timestamp,
+      description: this.editableData.description?.toLocaleUpperCase()
+    };
     // Actualizar los datos originales solo al guardar
     this.firestoreService.update(this.editableData).subscribe(() => {
       this.dialogRef.close(this.editableData);

@@ -40,6 +40,7 @@ interface ScannerData {
     data: string;
     timestamp: string;
     id?: string;
+    description?: string;
 }
 
 @Component({

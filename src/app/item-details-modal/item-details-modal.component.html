@@ -8,6 +8,15 @@
     <mat-label>Creado</mat-label>
     <input matInput [(ngModel)]="editableData.timestamp" [disabled]="true" style="width: 100%"/>
   </mat-form-field>
+  <mat-form-field appearance="fill" style="width: 100%">
+    <mat-label>Descripcion</mat-label>
+    <textarea matInput [(ngModel)]="editableData.description"  style="width: 100%" multiple rows="2" ></textarea>
+    <!-- <input matInput [(ngModel)]="editableData.description"  style="width: 100%" multiple rows="2" /> -->
+  </mat-form-field>
+  <!-- <mat-form-field class="example-full-width">
+    <mat-label>Leave a comment</mat-label>
+    <textarea matInput placeholder="Ex. It makes me feel..."></textarea>
+  </mat-form-field> -->
 </div>
 <div mat-dialog-actions>
   <button mat-button color="accent" (click)="save()">Guardar</button>
