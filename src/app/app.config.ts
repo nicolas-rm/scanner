@@ -31,10 +31,17 @@ export const appConfig: ApplicationConfig = {
         provideZoneChangeDetection({ eventCoalescing: true }),
         provideRouter(routes),
         provideAnimationsAsync(),
-        provideFirebaseApp(() => initializeApp(firebaseConfig)),
+        provideFirebaseApp(() => initializeApp(firebaseConfig, {
+            automaticDataCollectionEnabled: true,
+            name: 'ngx-qr-scanner',
+        })),
         provideFirestore(() => getFirestore()),
         importProvidersFrom(AngularFirestoreModule),
-        importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
+        importProvidersFrom(AngularFirestoreModule.enablePersistence()),
+        importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig, {
+            automaticDataCollectionEnabled: true,
+            name: 'ngx-qr-scanner',
+        })),
         importProvidersFrom(AngularFirestore), provideServiceWorker('ngsw-worker.js', {
             enabled: !isDevMode(),
             registrationStrategy: 'registerWhenStable:30000'
