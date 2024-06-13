@@ -1,4 +1,7 @@
-<h2 mat-dialog-title>Detalles</h2>
+<h2 mat-dialog-title>
+  Detalles
+  <span mat-dialog-header class="close-icon" aria-label="Close dialog">#{{ this.data.data }}</span>
+</h2>
 <div mat-dialog-content class="w-100" fxLayout="column" fxLayoutAlign="start stretch" style="width: 100%">
   <mat-form-field appearance="fill" style="width: 100%">
     <mat-label>Code</mat-label>
