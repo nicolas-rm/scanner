@@ -1,4 +1,4 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import moment from 'moment';
 
@@ -40,7 +40,7 @@ import { FirestoreService } from './services/firestore.service';
     styleUrl: './app.component.scss',
     providers: [FirestoreService],
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
     title = 'QR & Barcode Scanner';
 
     scannedItems: { data: string; timestamp: string }[] = [];
@@ -88,8 +88,10 @@ export class AppComponent {
         }
     }
 
-    async ngOnInit() {
-        await this.getVideoInputDevices();
+    ngOnInit() {
+        this.fireStore.getAlls().subscribe((data) => {
+            this.scannedItems = data; 
+        });
     }
 
     async getVideoInputDevices() {
