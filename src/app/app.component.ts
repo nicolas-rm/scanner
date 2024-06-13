@@ -187,33 +187,17 @@ export class AppComponent implements OnInit {
     }
 
     search() {
-
         this.searchInput = this.searchInput.trim().toLocaleUpperCase();
-        if (this.searchInput.length >= 3) {
-            this.loading = true; // Mostrar spinner al iniciar la búsqueda
-            this.fireStore.filter(this.searchInput).subscribe({
-                next: (data) => {
-                    this.scannedItems = data;
-                    this.loading = false; // Ocultar spinner cuando se complete la búsqueda
-                },
-                error: (error) => {
-                    this.loading = false; // Ocultar spinner en caso de error
-                    this.showSnackBar('Error al realizar la búsqueda.');
-                }
-            });
-        }else {
-            this.loading = false; // Mostrar spinner al iniciar la carga de datos
-            this.fireStore.getAlls().subscribe({
-                next: (data) => {
-                    this.scannedItems = data;
-                    this.loading = false; // Ocultar spinner cuando se complete la carga de datos
-                },
-                error: (error) => {
-                    this.loading = false; // Ocultar spinner en caso de error
-                    this.showSnackBar('Error al cargar los datos.');
-                }
-            });
-        }
+        this.fireStore.filter(this.searchInput).subscribe({
+            next: (data) => {
+                this.scannedItems = data;
+                this.loading = false; // Ocultar spinner cuando se complete la búsqueda
+            },
+            error: (error) => {
+                this.loading = false; // Ocultar spinner en caso de error
+                this.showSnackBar('Error al realizar la búsqueda.');
+            }
+        });
     }
 
     viewItem(item: ScannerData) {
