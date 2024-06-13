@@ -1,7 +1,7 @@
 import {
     ApplicationConfig,
     importProvidersFrom,
-    provideZoneChangeDetection,
+    provideZoneChangeDetection, isDevMode,
 } from "@angular/core";
 import { provideRouter } from "@angular/router";
 
@@ -15,6 +15,7 @@ import {
 } from "@angular/fire/compat/firestore";
 import { getFirestore, provideFirestore } from "@angular/fire/firestore";
 import { initializeApp, provideFirebaseApp } from "@angular/fire/app";
+import { provideServiceWorker } from '@angular/service-worker';
 
 const firebaseConfig = {
     apiKey: "AIzaSyDsioBhqFy87gwD7O_1d3U0f3KX82TKplw",
@@ -34,6 +35,9 @@ export const appConfig: ApplicationConfig = {
         provideFirestore(() => getFirestore()),
         importProvidersFrom(AngularFirestoreModule),
         importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
-        importProvidersFrom(AngularFirestore),
+        importProvidersFrom(AngularFirestore), provideServiceWorker('ngsw-worker.js', {
+            enabled: !isDevMode(),
+            registrationStrategy: 'registerWhenStable:30000'
+          }),
     ],
 };
