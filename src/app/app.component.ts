@@ -192,8 +192,7 @@ export class AppComponent implements OnInit, AfterViewInit {
             return;
         }
 
-        if (this.searchInput.trim() === '') {
-            this.getAll();
+        if(this.searchInput.length < 3) {
             this.loading = false;
             return;
         }
@@ -202,8 +201,10 @@ export class AppComponent implements OnInit, AfterViewInit {
         this.fireStore.filter(this.searchInput).subscribe({
             next: (data) => {
                 this.scannedItems = data;
+                this.loading = false;
             },
             error: () => {
+                this.loading = false;
                 this.showSnackBar('Error al realizar la búsqueda.');
             },
             complete: () => {
