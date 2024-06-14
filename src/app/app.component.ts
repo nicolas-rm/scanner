@@ -62,20 +62,10 @@ export class AppComponent implements OnInit {
     tryHarder: boolean = false;
     flashEnabled: boolean = false;
     torchAvailable$ = new BehaviorSubject<boolean>(false);
-    loading: boolean = false; // Variable de estado para el spinner
+    loading: boolean = false;
 
     availableFormats = [
-        // { format: BarcodeFormat.QR_CODE, name: 'QR Code' },
-        // { format: BarcodeFormat.DATA_MATRIX, name: 'Data Matrix' },
-        // { format: BarcodeFormat.AZTEC, name: 'Aztec' },
         { format: BarcodeFormat.CODE_128, name: 'Code 128' },
-        // { format: BarcodeFormat.CODE_39, name: 'Code 39' },
-        // { format: BarcodeFormat.EAN_13, name: 'EAN-13' },
-        // { format: BarcodeFormat.EAN_8, name: 'EAN-8' },
-        // { format: BarcodeFormat.ITF, name: 'ITF' },
-        // { format: BarcodeFormat.UPC_A, name: 'UPC-A' },
-        // { format: BarcodeFormat.UPC_E, name: 'UPC-E' },
-        // { format: BarcodeFormat.PDF_417, name: 'PDF 417' },
     ];
 
     allowedFormats: BarcodeFormat[] = this.availableFormats.map((f) => f.format);
@@ -84,50 +74,45 @@ export class AppComponent implements OnInit {
 
     @ViewChild('inputElement') inputElement!: ElementRef;
 
-    ngAfterViewInit() {
-        // this.inputElement.nativeElement.focus();
-    }
-
-    constructor(public dialog: MatDialog, private snackBar: MatSnackBar, private fireStore: FirestoreService) {
-        if (this.inputElement) {
-            this.inputElement.nativeElement.focus();
-            // Uppercase
-        }
-    }
+    constructor(public dialog: MatDialog, private snackBar: MatSnackBar, private fireStore: FirestoreService) { }
 
     ngOnInit() {
-        const inputs = async () => await this.getVideoInputDevices()
-        inputs()
+        this.getVideoInputDevices();
 
-        this.loading = true; // Mostrar spinner al iniciar la carga de datos
+        this.loading = true;
         this.manualInput = this.manualInput.toLocaleUpperCase();
 
         this.fireStore.getAlls().subscribe({
             next: (data) => {
                 this.scannedItems = data;
-                this.loading = false; // Ocultar spinner cuando se complete la carga de datos
+                this.loading = false;
             },
-            error: (error) => {
-                this.loading = false; // Ocultar spinner en caso de error
+            error: () => {
+                this.loading = false;
                 this.showSnackBar('Error al cargar los datos.');
             }
         });
     }
 
+    ngAfterViewInit() {
+        if (this.inputElement) {
+            this.inputElement.nativeElement.focus();
+        }
+    }
+
     async getVideoInputDevices() {
         const devices: MediaDeviceInfo[] = await navigator.mediaDevices.enumerateDevices();
         this.cameras = devices.filter((device) => device.kind === 'videoinput');
-        this.tryHarder = true
+        this.tryHarder = true;
     }
 
     async selectCamera(camera: MediaDeviceInfo) {
         this.selectedCamera = camera;
-        this.tryHarder = true
+        this.tryHarder = true;
     }
 
     async handleQrCodeResult(resultString: string) {
         const timestamp = moment().format('YYYY-MM-DD HH:mm A');
-        // Verificar que no exista
         if (this.scannedItems.find((item) => item.data === resultString.toLocaleUpperCase())) {
             this.showSnackBar('Codigo Existente.' + '\n' + resultString.toLocaleUpperCase());
             return;
@@ -135,13 +120,13 @@ export class AppComponent implements OnInit {
 
         this.fireStore.create({ data: resultString.toLocaleUpperCase(), timestamp }).subscribe({
             next: () => {
-                this.scanning = false; // Stop scanning after receiving a result
+                this.scanning = false;
             },
-            error: (error) => {
+            error: () => {
                 this.showSnackBar('Error al guardar el código.');
             }
         });
-        this.scanning = false; // Stop scanning after receiving a result
+        this.scanning = false;
     }
 
     async startScan() {
@@ -168,7 +153,6 @@ export class AppComponent implements OnInit {
         if (this.manualInput.trim()) {
             const timestamp = moment().format('YYYY-MM-DD HH:mm A');
 
-            // Verificar si no existe
             if (this.scannedItems.find((item) => item.data === this.manualInput.toLocaleUpperCase())) {
                 this.showSnackBar('Codigo Existente.' + '\n' + this.manualInput.toLocaleUpperCase());
                 return;
@@ -178,7 +162,7 @@ export class AppComponent implements OnInit {
                 next: () => {
                     this.manualInput = '';
                 },
-                error: (error) => {
+                error: () => {
                     this.showSnackBar('Error al guardar el código.');
                 }
             });
@@ -191,10 +175,10 @@ export class AppComponent implements OnInit {
         this.fireStore.filter(this.searchInput).subscribe({
             next: (data) => {
                 this.scannedItems = data;
-                this.loading = false; // Ocultar spinner cuando se complete la búsqueda
+                this.loading = false;
             },
-            error: (error) => {
-                this.loading = false; // Ocultar spinner en caso de error
+            error: () => {
+                this.loading = false;
                 this.showSnackBar('Error al realizar la búsqueda.');
             }
         });
@@ -212,13 +196,13 @@ export class AppComponent implements OnInit {
 
         dialogRef.afterClosed().subscribe(result => {
             if (result) {
-                this.loading = true; // Mostrar spinner al iniciar la eliminación
+                this.loading = true;
                 this.fireStore.delete(item.id!).subscribe({
                     next: () => {
-                        this.loading = false; // Ocultar spinner cuando se complete la eliminación
+                        this.loading = false;
                     },
-                    error: (error) => {
-                        this.loading = false; // Ocultar spinner en caso de error
+                    error: () => {
+                        this.loading = false;
                         this.showSnackBar('Error al eliminar el código.');
                     }
                 });
@@ -237,11 +221,19 @@ export class AppComponent implements OnInit {
         this.flashEnabled = !this.flashEnabled;
     }
 
+    onInput(event: Event): void {
+        const inputElement = event.target as HTMLInputElement;
+        if (inputElement.value) {
+            this.manualInput = inputElement.value;
+            this.addManualInput();
+        }
+    }
+
     private showSnackBar(message: string) {
         this.snackBar.open(message, 'Cerrar', {
-            horizontalPosition: 'center', // Posición horizontal 'start' | 'center' | 'end' | 'left' | 'right'
+            horizontalPosition: 'center',
             verticalPosition: 'top',
-            duration: 5000, // Duración en milisegundos
+            duration: 5000,
         });
     }
 }
