@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Router, RouterOutlet } from '@angular/router';
 import moment from 'moment';
 
@@ -53,7 +53,7 @@ interface ScannerData {
     styleUrl: './app.component.scss',
     providers: [FirestoreService],
 })
-export class AppComponent implements OnInit {
+export class AppComponent implements OnInit, AfterViewInit {
     title = 'QR & Barcode Scanner';
     scannedItems: ScannerData[] = [];
     scanning: boolean = false;
@@ -74,11 +74,29 @@ export class AppComponent implements OnInit {
 
     @ViewChild('inputElement') inputElement!: ElementRef;
 
-    constructor(public dialog: MatDialog, private snackBar: MatSnackBar, private fireStore: FirestoreService) { }
+    ngAfterViewInit() {
+        if (this.inputElement) {
+            this.inputElement.nativeElement.focus();
+            this.cdr.detectChanges(); // Forzar la detección de cambios aquí
+        }
+        // this.inputElement.nativeElement.focus();
+    }
+
+
+    constructor(
+        public dialog: MatDialog, 
+        private snackBar: MatSnackBar, 
+        private fireStore: FirestoreService,
+        private cdr: ChangeDetectorRef // Añadir ChangeDetectorRef aquí
+    ) { }
 
     ngOnInit() {
         this.getVideoInputDevices();
+        this.getAll()
+    }
 
+    // Obtener los codigos
+    getAll() {
         this.loading = true;
         this.manualInput = this.manualInput.toLocaleUpperCase();
 
@@ -92,12 +110,6 @@ export class AppComponent implements OnInit {
                 this.showSnackBar('Error al cargar los datos.');
             }
         });
-    }
-
-    ngAfterViewInit() {
-        if (this.inputElement) {
-            this.inputElement.nativeElement.focus();
-        }
     }
 
     async getVideoInputDevices() {
@@ -171,15 +183,31 @@ export class AppComponent implements OnInit {
     }
 
     search() {
+
+        this.loading = true;
+
+        if (!this.searchInput) {
+            this.getAll();
+            this.loading = false;
+            return;
+        }
+
+        if (this.searchInput.trim() === '') {
+            this.getAll();
+            this.loading = false;
+            return;
+        }
+
         this.searchInput = this.searchInput.trim().toLocaleUpperCase();
         this.fireStore.filter(this.searchInput).subscribe({
             next: (data) => {
                 this.scannedItems = data;
-                this.loading = false;
             },
             error: () => {
-                this.loading = false;
                 this.showSnackBar('Error al realizar la búsqueda.');
+            },
+            complete: () => {
+                this.loading = false;
             }
         });
     }

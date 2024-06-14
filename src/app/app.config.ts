@@ -35,7 +35,6 @@ export const appConfig: ApplicationConfig = {
         provideFirestore(() => getFirestore()),
         importProvidersFrom(AngularFirestoreModule),
         importProvidersFrom(AngularFirestoreModule.enablePersistence({
-            experimentalForceOwningTab: true,
             synchronizeTabs: true
         })),
         importProvidersFrom(AngularFireModule.initializeApp(firebaseConfig)),
